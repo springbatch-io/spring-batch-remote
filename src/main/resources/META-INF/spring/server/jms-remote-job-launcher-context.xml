@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath:/META-INF/spring/server/remote-job-launcher-context.xml"/>
+	
+	<int-jms:outbound-gateway 
+		reply-channel="job.start.reply.channel"
+		connection-factory="connectionFactory"
+		request-destination="batch.request.queue"
+		request-channel="job.start.request.channel"
+		reply-destination="batch.reply.queue"/>	
+
+</beans>

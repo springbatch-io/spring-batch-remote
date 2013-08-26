@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+	<bean id="gateway" class="org.springframework.integration.core.MessagingTemplate">
+		<property name="defaultChannel" ref="job.start.out.channel"/>
+	</bean>
+
+	<int:channel id="job.start.out.channel"/>
+	
+	<int:payload-serializing-transformer
+		input-channel="job.start.out.channel" output-channel="job.start.request.channel"/>
+	
+	<int:channel id="job.start.request.channel"/>	
+	
+	<int:channel id="job.start.reply.channel"/>
+	
+	<int:payload-deserializing-transformer
+		input-channel="job.start.reply.channel" output-channel="job.start.in.channel"/>
+	
+	<int:channel id="job.start.in.channel">
+		<int:queue/>
+	</int:channel>
+
+	<bean id="remoteJobLauncher" class="io.springbatch.remote.launcher.MessageChannelJobLauncher">
+		<property name="gateway" ref="gateway"/>
+		<property name="replyChannel" ref="job.start.in.channel"/>
+	</bean>
+	
+	<bean id="jobOperator"
+		class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="jobLauncher" ref="remoteJobLauncher"/>
+		<property name="jobRegistry" ref="remoteJobRegistry"/>
+		<property name="jobRepository" ref="jobRepository"/>	
+	</bean>	
+
+
+</beans>
