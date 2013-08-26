@@ -13,6 +13,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +37,6 @@ public class RemoteJobRegistry implements JobRegistry, InitializingBean  {
 	public RemoteJobRegistry(JobRegistry localJobRegistry) {
 		this.localJobRegistry = localJobRegistry;
 	}
-	
 	
 	@Override
 	public Collection<String> getJobNames() {
@@ -90,7 +90,9 @@ public class RemoteJobRegistry implements JobRegistry, InitializingBean  {
 
 	@Override
 	public void unregister(String jobName) {
-		jobEntityRepository.delete(jobName);
+		//get the id by the name
+		JobEntity entity = jobEntityRepository.findByName(jobName);
+		jobEntityRepository.delete(entity.getId());
 		//remove locally
 		localJobRegistry.unregister(jobName);
 	}
@@ -98,6 +100,11 @@ public class RemoteJobRegistry implements JobRegistry, InitializingBean  {
 
 	public void setJobEntityRepository(JobEntityRepository jobEntityRepository) {
 		this.jobEntityRepository = jobEntityRepository;
+	}
+
+
+	public void setLocalJobRegistry(JobRegistry localJobRegistry) {
+		this.localJobRegistry = localJobRegistry;
 	}
 
 

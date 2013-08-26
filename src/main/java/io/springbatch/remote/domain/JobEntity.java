@@ -2,6 +2,15 @@ package io.springbatch.remote.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.springframework.batch.core.JobParametersIncrementer;
 
 /**
@@ -10,18 +19,33 @@ import org.springframework.batch.core.JobParametersIncrementer;
  * 
  *
  */
+@Entity
+@Table(name="batch_job_entity")
 public class JobEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="job_entity_sequence")
+	@SequenceGenerator(name="job_entity_sequence",sequenceName="batch_job_entity_seq")
 	private Long id;
 	
+	@Column(name="job_entity_version")
 	private Integer version = 0;
 	
+	@Column(name="job_name")
 	private String name;
 	
+	@Transient
 	private JobParametersIncrementer incrementer;
 
+	public JobEntity() { }
+	
+	public JobEntity(String name) {
+		this();
+		this.name = name;
+	}
+	
 	public Long getId() {
 		return id;
 	}
