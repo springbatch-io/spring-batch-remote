@@ -11,17 +11,19 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.Message;
 import org.springframework.integration.core.MessagingOperations;
 import org.springframework.integration.core.PollableChannel;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.util.Assert;
 
 /**
  * message channel implementation of jobLauncher
  * @author 
  *
  */
-public class MessageChannelJobLauncher implements JobLauncher {
+public class MessageChannelJobLauncher implements JobLauncher, InitializingBean {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MessageChannelJobLauncher.class);
 
@@ -85,6 +87,12 @@ public class MessageChannelJobLauncher implements JobLauncher {
 
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(gateway,"A gateway must be set");
+		Assert.notNull(replyChannel,"a reply channel must be set");
 	}
 
 }

@@ -2,9 +2,7 @@ package io.springbatch.remote.registry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import io.springbatch.remote.domain.JobEntity;
 import io.springbatch.remote.domain.jpa.JpaJobEntityRepository;
 
@@ -17,14 +15,15 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.job.SimpleJob;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+@DirtiesContext
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:/META-INF/spring/common/remote-registry-context.xml"})
 @ActiveProfiles("junit")

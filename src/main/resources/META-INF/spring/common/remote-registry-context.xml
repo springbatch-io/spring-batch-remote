@@ -5,11 +5,18 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:tx="http://www.springframework.org/schema/tx"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<aop:config>
+		<aop:advisor advice-ref="jobEntitySerializer" pointcut="execution(* io.springbatch.remote.domain.jpa.JpaJobEntityRepository.save(..))"/>
+		<aop:advisor advice-ref="jobEntityDeserializer" pointcut="execution(* io.springbatch.remote.domain.jpa.JpaJobEntityRepository.find*(..))"/>
+	</aop:config>
 
 	<jpa:repositories base-package="io.springbatch.remote.domain"/>
 	
@@ -26,6 +33,10 @@
 	</bean>
 	
 	<tx:annotation-driven/>
+	
+	<bean id="jobEntitySerializer" class="io.springbatch.remote.domain.jpa.JobEntitySerializer"/>
+	
+	<bean id="jobEntityDeserializer" class="io.springbatch.remote.domain.jpa.JobEntityDeserializer"/>
 	
 	<bean id="jobRegistry" class="io.springbatch.remote.registry.RemoteJobRegistry">
 		<constructor-arg>

@@ -9,8 +9,14 @@
   <category name="org.hibernate">
     <priority value="error" />
   </category>
+  <category name="io.springbatch">
+    <priority value="debug" />
+  </category>
+  <category name="org.springframework.integration.channel">
+    <priority value="debug" />
+  </category>
   <root>
-    <priority value ="info" />
+    <priority value ="warn" />
     <appender-ref ref="STDOUT" />
   </root>
 </log4j:configuration>

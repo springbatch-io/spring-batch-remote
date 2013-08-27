@@ -38,6 +38,9 @@ public class JobEntity implements Serializable {
 	
 	@Transient
 	private JobParametersIncrementer incrementer;
+	
+	@Column(name="job_parameters_incrementer")
+	private String jobParametersIncrementer;
 
 	public JobEntity() { }
 	
@@ -76,6 +79,14 @@ public class JobEntity implements Serializable {
 
 	public void setIncrementer(JobParametersIncrementer incrementer) {
 		this.incrementer = incrementer;
+	}
+
+	public String getJobParametersIncrementer() {
+		return jobParametersIncrementer;
+	}
+
+	public void setJobParametersIncrementer(String jobParametersIncrementer) {
+		this.jobParametersIncrementer = jobParametersIncrementer;
 	}
 
 	@Override
