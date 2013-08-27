@@ -28,6 +28,7 @@
 	<bean id="remoteJobLauncher" class="io.springbatch.remote.launcher.MessageChannelJobLauncher">
 		<property name="gateway" ref="gateway"/>
 		<property name="replyChannel" ref="job.start.in.channel"/>
+		<property name="jobRepository" ref="jobRepository"/>
 	</bean>
 	
 	<bean id="jobOperator"
@@ -51,7 +52,8 @@
 		
 		<bean id="remoteJobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
 		
-		<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>	
+		<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+			
 	</beans>
 
 

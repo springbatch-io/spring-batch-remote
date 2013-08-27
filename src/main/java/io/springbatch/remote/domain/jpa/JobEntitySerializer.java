@@ -18,16 +18,21 @@ public class JobEntitySerializer implements MethodInterceptor {
 		if (argument instanceof Iterable) {
 			//go through and serialize
 			for (JobEntity entity : (Iterable<JobEntity>) argument) {
-				if (entity.getIncrementer() != null) {
-					entity.setJobParametersIncrementer(jobEntityUtils.serializeJobIncrementer(entity.getIncrementer()));
-				}//end for
+				serialize(entity);
 			}//end for
 		} else if (argument instanceof JobEntity) {
-			if (((JobEntity)argument).getIncrementer() != null) {
-				((JobEntity)argument).setJobParametersIncrementer(jobEntityUtils.serializeJobIncrementer(((JobEntity)argument).getIncrementer()));
-			}//end for			
+			serialize((JobEntity)argument);
 		}//end if
 		return invocation.proceed();//invoke
 	}
 
+	
+	protected void serialize(JobEntity entity) {
+		if (entity.getIncrementer() != null) {
+			entity.setJobParametersIncrementer(jobEntityUtils.serializeJobIncrementer(entity.getIncrementer()));
+		}//end for
+		if (entity.getValidator() != null) {
+			entity.setJobParametersValidator(jobEntityUtils.serializeJobParametersValidator(entity.getValidator()));
+		}//end for		
+	}
 }

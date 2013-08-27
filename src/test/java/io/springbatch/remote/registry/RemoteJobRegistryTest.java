@@ -23,7 +23,6 @@ import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
-import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.NoSuchJobException;
 
 public class RemoteJobRegistryTest {
@@ -92,11 +91,13 @@ public class RemoteJobRegistryTest {
 	public void testUnregister() throws Exception {
 		//mock
 		JobEntity entity = mock(JobEntity.class);
+		Job job = mock(Job.class);
 		//behavior
+		when(entity.getJob()).thenReturn(job);
 		when(localJobRegistry.getJob(anyString())).thenThrow(NoSuchJobException.class);
 		when(jobEntityRepository.findByName(anyString())).thenReturn(entity);
 		//check it's there
-		assertTrue(registry.getJob("any name") instanceof SimpleJob);
+		assertTrue(registry.getJob("any name") instanceof Job);
 		//now remove it
 		registry.unregister("any name");
 		//check 

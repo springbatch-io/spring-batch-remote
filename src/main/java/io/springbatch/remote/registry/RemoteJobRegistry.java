@@ -13,8 +13,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.MapJobRegistry;
-import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +63,7 @@ public class RemoteJobRegistry implements JobRegistry, InitializingBean  {
 				throw new NoSuchJobException("job doesn't exist " + name);
 			}//end if
 			//build a 'fake' job
-			SimpleJob job = new SimpleJob(entity.getName());
-			job.setJobParametersIncrementer(entity.getIncrementer());
+			Job job = entity.getJob();
 			logger.debug("retrieved from remote JobRegistry");
 			//return
 			return job;			
@@ -77,10 +74,10 @@ public class RemoteJobRegistry implements JobRegistry, InitializingBean  {
 	@Override
 	public void register(JobFactory jobFactory) throws DuplicateJobException {
 		//build an entity
-		JobEntity entity = new JobEntity();
-		entity.setName(jobFactory.getJobName());
-		//get the incrementer
-		entity.setIncrementer(jobFactory.createJob().getJobParametersIncrementer());
+		//get the job
+		Job job = jobFactory.createJob();
+		//build the entity
+		JobEntity entity = new JobEntity(job);
 		//save
 		jobEntityRepository.save(entity);
 		//register it 'locally'

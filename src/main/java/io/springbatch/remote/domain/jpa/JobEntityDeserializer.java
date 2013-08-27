@@ -17,18 +17,23 @@ public class JobEntityDeserializer implements MethodInterceptor {
 		Object result = invocation.proceed();
 		//deserialize
 		if (result instanceof JobEntity) {
-			if (StringUtils.isNotEmpty(((JobEntity)result).getJobParametersIncrementer())) {
-				((JobEntity)result).setIncrementer(jobEntityUtils.deserializeJobIncrement(((JobEntity)result).getJobParametersIncrementer()));
-			}//end if
+			deserialize((JobEntity)result);
 		} else if (result instanceof Iterable) {
 			for (JobEntity entity : (Iterable<JobEntity>) result) {
-				if (StringUtils.isNotEmpty(entity.getJobParametersIncrementer())) {
-					entity.setIncrementer(jobEntityUtils.deserializeJobIncrement(entity.getJobParametersIncrementer()));
-				}//end if				
+				deserialize(entity);				
 			}//end for
 		}//end if
 		//return
 		return result;
 	}
-
+	
+	protected void deserialize(JobEntity entity) {
+		if (StringUtils.isNotEmpty(entity.getJobParametersIncrementer())) {
+			entity.setIncrementer(jobEntityUtils.deserializeJobIncrement(entity.getJobParametersIncrementer()));
+		}//end if		
+		
+		if (StringUtils.isNotEmpty(entity.getJobParametersValidator())) {
+			entity.setValidator(jobEntityUtils.deserializeJobParametersValidator(entity.getJobParametersValidator()));
+		}//end if				
+	}
 }

@@ -10,8 +10,10 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.Message;
 import org.springframework.integration.core.MessagingOperations;
 import org.springframework.integration.core.PollableChannel;
@@ -33,11 +35,24 @@ public class MessageChannelJobLauncher implements JobLauncher, InitializingBean 
 	
 	private PollableChannel replyChannel;
 	
+	private JobRepository jobRepository;
+	
 	private long timeout = 5 * 1000;//default timeout
 	
 	@Override
 	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-		//extract the jobname
+		//check if there's an instance
+		JobExecution execution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
+		if (execution != null) {
+			if (!job.isRestartable()) {
+				throw new JobRestartException("JobInstance already exists and is not restartable");
+			}//end if
+		}//end if
+		//validate the jobparameters locally
+		if (job.getJobParametersValidator() != null) {
+			job.getJobParametersValidator().validate(jobParameters);
+		}//end if
+		//execute
 		//build
 		Message<?> request = MessageBuilder.withPayload(jobParameters).setHeader(JOB_NAME_HEADER, job.getName()).build();
 		//send
@@ -89,10 +104,15 @@ public class MessageChannelJobLauncher implements JobLauncher, InitializingBean 
 		this.timeout = timeout;
 	}
 
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(gateway,"A gateway must be set");
 		Assert.notNull(replyChannel,"a reply channel must be set");
+		Assert.notNull(jobRepository,"a jobRepository must be set");
 	}
 
 }

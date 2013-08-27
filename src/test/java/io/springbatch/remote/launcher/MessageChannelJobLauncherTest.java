@@ -13,6 +13,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.integration.Message;
 import org.springframework.integration.core.MessagingOperations;
@@ -26,13 +27,17 @@ public class MessageChannelJobLauncherTest {
 
 	private PollableChannel replyChannel;
 	
+	private JobRepository jobRepository;
+	
 	@Before
 	public void before() throws Exception {
 		gateway = mock(MessagingOperations.class);
 		replyChannel = mock(PollableChannel.class);
+		jobRepository = mock(JobRepository.class);
 		jobLauncher = new MessageChannelJobLauncher();
 		jobLauncher.setGateway(gateway);
 		jobLauncher.setReplyChannel(replyChannel);
+		jobLauncher.setJobRepository(jobRepository);
 		//check
 		jobLauncher.afterPropertiesSet();
 	}

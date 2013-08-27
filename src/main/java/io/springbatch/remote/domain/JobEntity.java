@@ -11,7 +11,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.job.SimpleJob;
 
 /**
  * simple object to record a job name with a version
@@ -41,12 +44,29 @@ public class JobEntity implements Serializable {
 	
 	@Column(name="job_parameters_incrementer")
 	private String jobParametersIncrementer;
+	
+	@Transient
+	private JobParametersValidator validator;
+	
+	@Column(name="job_parameters_validator")
+	private String jobParametersValidator;
 
+	@Column(name="restartable")
+	private boolean restartable;
+	
 	public JobEntity() { }
 	
 	public JobEntity(String name) {
 		this();
 		this.name = name;
+	}
+	
+	public JobEntity(Job job) {
+		this();
+		this.name = job.getName();
+		this.incrementer = job.getJobParametersIncrementer();
+		this.validator = job.getJobParametersValidator();
+		this.restartable = job.isRestartable();
 	}
 	
 	public Long getId() {
@@ -89,12 +109,44 @@ public class JobEntity implements Serializable {
 		this.jobParametersIncrementer = jobParametersIncrementer;
 	}
 
+	public JobParametersValidator getValidator() {
+		return validator;
+	}
+
+	public void setValidator(JobParametersValidator validator) {
+		this.validator = validator;
+	}
+
+	public String getJobParametersValidator() {
+		return jobParametersValidator;
+	}
+
+	public void setJobParametersValidator(String jobParametersValidator) {
+		this.jobParametersValidator = jobParametersValidator;
+	}
+
+	public boolean isRestartable() {
+		return restartable;
+	}
+
+	public void setRestartable(boolean restartable) {
+		this.restartable = restartable;
+	}
+
+	public Job getJob() {
+		//create a simpleJob
+		SimpleJob job = new SimpleJob(this.getName());
+		job.setJobParametersIncrementer(this.getIncrementer());
+		job.setJobParametersValidator(this.getValidator());
+		job.setRestartable(this.isRestartable());
+		//return
+		return job;
+	}
+	
 	@Override
 	public String toString() {
 		return "JobEntity [id=" + id + ", version=" + version + ", name="
 				+ name + "]";
 	}
-	
-	
 	
 }
